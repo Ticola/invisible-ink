@@ -3,7 +3,8 @@ import Header from './components/Header';
 import MainContent from './components/MainContent';
 import InputForm from './components/InputForm';
 import Loader from './components/Loader';
-import ImageAltList from './components/ImageAltList';
+import Footer from './components/Footer';
+import ImageAltTable from './components/ImageAltTable';
 import { scrapeAltTexts } from './services/scrapeService';
 
 function App() {
@@ -20,13 +21,10 @@ function App() {
     setLoading(true);
   
     try {
-      // Use the service function to get the alt texts
       const fetchedAltTexts = await scrapeAltTexts(url);
       setAltTexts(fetchedAltTexts);
-      console.log('Updated alt texts state:', fetchedAltTexts);
     } catch (error) {
       console.error('Error fetching alt texts:', error);
-      // Here you can set an error state and show an error message to the user if needed
       setAltTexts([]); // Setting to an empty array or handling as needed
     }
   
@@ -45,9 +43,10 @@ function App() {
             onSubmit={handleFormSubmit}
           />
           {loading && <Loader />}
-          {!loading && altTexts && <ImageAltList altTexts={altTexts} />}
+          {!loading && altTexts && <ImageAltTable altTexts={altTexts} />}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

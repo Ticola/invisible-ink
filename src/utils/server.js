@@ -21,8 +21,6 @@ app.get('/', (req, res) => {
 });
 
 app.post('/scrape', async (req, res) => {
-  console.log('Scrape request received:', req.body);
-
   const { url } = req.body;
 
   try {
@@ -35,10 +33,38 @@ app.post('/scrape', async (req, res) => {
     const $ = cheerio.load(html);
     const altTexts = [];
 
+    const getBaseUrl = (url) => {
+      const urlObject = new URL(url);
+      return urlObject.protocol + '//' + urlObject.host;
+    };
+    
+    const baseUrl = getBaseUrl(url);
+    
     $('img').each((i, elem) => {
-      altTexts.push($(elem).attr('alt'));
-    });
-    console.log(`Sending back alt texts: ${altTexts}`);
+      let src = $(elem).attr('src') || '';
+      // If src is not a full URL, check if it's a relative path or a placeholder
+      if (!src.match(/^https?:\/\//)) {
+        // If src is a placeholder, attempt to find a srcset in a parent <picture> element
+        if (src.startsWith('?') || src === '') {
+          const srcset = $(elem).closest('picture').find('source').attr('srcset');
+          if (srcset) {
+            // If srcset is a relative path, prepend the base URL
+            src = new URL(srcset.split(' ')[0], baseUrl).href;
+          }
+        } else if (src) {
+          // If src is a relative path, prepend the base URL
+          src = new URL(src, baseUrl).href;
+        }
+      }
+
+      // If src is still not a valid URL, use placeholder
+      if (!src.match(/^https?:\/\/.+\/.+/)) {
+        src = "https://www.whirlpool.com/content/dam/image.jpg";
+      }
+
+      const alt = $(elem).attr('alt') || '[No Alt Text]';
+      altTexts.push({ src, alt });
+    });   
 
     res.json({ altTexts }); // Send back the result
 

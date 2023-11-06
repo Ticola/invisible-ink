@@ -1,7 +1,4 @@
-const ImageAltList = ({ altTexts = [] }) => {
-  // Log the altTexts to see what you're getting
-  console.log(altTexts);
-
+const ImageAltList = ({ altTexts }) => {
   return (
     <ol className="list-decimal list-inside">
       {altTexts.map((alt, index) => (
