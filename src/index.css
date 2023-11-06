@@ -1,3 +1,21 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+.progress-circle-svg {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+}
+
+.progress-circle-prog {
+  transition: stroke-dashoffset 0.6s ease 0s;
+}
+
+/* Absolute positioning within the loader wrapper */
+.absolute {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}

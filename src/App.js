@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import Header from './components/Header';
 import MainContent from './components/MainContent';
 import InputForm from './components/InputForm';
 import Loader from './components/Loader';
 import ImageAltList from './components/ImageAltList';
+import { scrapeAltTexts } from './services/scrapeService';
 
 function App() {
   const [url, setUrl] = useState('');
@@ -16,18 +18,24 @@ function App() {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
-
-    // Simulate an API call with a timeout
-    setTimeout(() => {
-      // This is where you would normally convert the scraped alt texts to an array and set the state
-      // For simulation, we're just setting some static text
-      setAltTexts(["Example Alt Text 1", "Example Alt Text 2", "[No Alt Text]"]); // Replace with actual scraped alt texts
-      setLoading(false);
-    }, 2000); // Simulate a network call with a 2-second delay
+  
+    try {
+      // Use the service function to get the alt texts
+      const fetchedAltTexts = await scrapeAltTexts(url);
+      setAltTexts(fetchedAltTexts);
+      console.log('Updated alt texts state:', fetchedAltTexts);
+    } catch (error) {
+      console.error('Error fetching alt texts:', error);
+      // Here you can set an error state and show an error message to the user if needed
+      setAltTexts([]); // Setting to an empty array or handling as needed
+    }
+  
+    setLoading(false);
   };
-
+  
   return (
     <div className="flex flex-col min-h-screen">
+      <Header />
       <main className="flex-grow">
         <MainContent />
         <div className="mx-auto max-w-4xl p-4">
@@ -37,7 +45,7 @@ function App() {
             onSubmit={handleFormSubmit}
           />
           {loading && <Loader />}
-          {!loading && <ImageAltList altTexts={altTexts} />}
+          {!loading && altTexts && <ImageAltList altTexts={altTexts} />}
         </div>
       </main>
     </div>
