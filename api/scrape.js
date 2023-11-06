@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
 
       // If src is still not a valid URL, use placeholder
       if (!src.match(/^https?:\/\/.+\/.+/)) {
-        src = "https://www.example.com/content/dam/image.jpg";
+        src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/1362px-Placeholder_view_vector.svg.png";
       }
 
       const alt = $(elem).attr('alt') || '[No Alt Text]';
