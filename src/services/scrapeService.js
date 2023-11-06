@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const scrapeAltTexts = async (url) => {
   try {
-    const response = await axios.post('/scrape', { url });
+    const response = await axios.post('api/scrape', { url });
     return response.data.altTexts;
   } catch (error) {
     console.error('Error scraping data:', error);
