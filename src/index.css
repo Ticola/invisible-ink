@@ -2,6 +2,10 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+html {
+  scroll-behavior: smooth;
+}
+
 .progress-circle-svg {
   transform: rotate(-90deg);
   transform-origin: 50% 50%;
