@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 
 const ImageAltTable = ({ altTexts, isLoading }) => {
-  // State to track if the data is loaded
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
 
-  // useEffect to set data loaded state when altTexts are loaded
   useEffect(() => {
     if (!isLoading && altTexts && altTexts.length > 0) {
       setIsDataLoaded(true);
@@ -14,11 +12,10 @@ const ImageAltTable = ({ altTexts, isLoading }) => {
         setIsVisible(true);
       });
     }
-  }, [isLoading, altTexts]); // Run this effect when altTexts changes
+  }, [isLoading, altTexts]);
 
-  // Conditional rendering based on isDataLoaded
   if (!isDataLoaded) {
-    return null; // Or return a loading spinner or any other placeholder
+    return null;
   }
 
   return (
@@ -37,8 +34,7 @@ const ImageAltTable = ({ altTexts, isLoading }) => {
                 <img
                   src={item.src}
                   alt={item.alt}
-                  className="mx-auto h-auto max-w-full"
-                  style={{ maxHeight: '100px' }} // inline style for fixed height or use Tailwind's h-* classes
+                  className="mx-auto h-auto max-w-full max-h-[100px]"
                 />
               </div>
             </td>

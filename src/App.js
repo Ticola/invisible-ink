@@ -25,7 +25,7 @@ function App() {
       setAltTexts(fetchedAltTexts);
     } catch (error) {
       console.error('Error fetching alt texts:', error);
-      setAltTexts([]); // Setting to an empty array or handling as needed
+      setAltTexts([]);
     }
   
     setLoading(false);

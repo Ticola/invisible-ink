@@ -1,4 +1,3 @@
-// api/scrape.js
 const axios = require('axios');
 const cheerio = require('cheerio');
 
@@ -28,7 +27,8 @@ module.exports = async (req, res) => {
 
     const baseUrl = getBaseUrl(url);
 
-    $('img').each((i, elem) => {
+    // Exclude images within .cmp-experiencefragment--header and .cmp-experiencefragment--footer
+    $('img').not('.cmp-experiencefragment--header img').not('.cmp-experiencefragment--footer img').each((i, elem) => {
       let src = $(elem).attr('src') || '';
       // If src is not a full URL, check if it's a relative path or a placeholder
       if (!src.match(/^https?:\/\//)) {
