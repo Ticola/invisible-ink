@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
     const baseUrl = getBaseUrl(url);
 
     $('img, picture').not('.cmp-experiencefragment--header img, .cmp-experiencefragment--Header img, .cmp-experiencefragment--footer img, .cmp-experiencefragment--whirlpool-meganav img').each((i, elem) => {
-      let src = $(elem).attr('data-src') || $(elem).attr('src') || '';
+      let src = $(elem).attr('src') || $(elem).attr('data-src') || '';
       let alt = $(elem).attr('alt') || '[No Alt Text]';
       const picture = $(elem).is('picture') ? $(elem) : $(elem).closest('picture');
 
@@ -43,12 +43,12 @@ module.exports = async (req, res) => {
         } else {
           // If no srcset, use the img src or data-src
           const imgElem = picture.find('img');
-          src = imgElem.attr('data-src') || imgElem.attr('src') || '';
+          src = imgElem.attr('src') || imgElem.attr('data-src') || '';
           alt = imgElem.attr('alt') || '[No Alt Text]';
         }
       } else if ($(elem).is('img')) {
         // For img elements, simply use src or data-src
-        src = $(elem).attr('data-src') || $(elem).attr('src') || '';
+        src = $(elem).attr('src') || $(elem).attr('data-src') || '';
       }
 
       if (src && !src.startsWith('http://') && !src.startsWith('https://')) {
