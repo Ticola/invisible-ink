@@ -25,33 +25,30 @@ module.exports = async (req, res) => {
     };
 
     const baseUrl = getBaseUrl(url);
-    
-    const images = $('img').not('.cmp-experiencefragment--header img, .cmp-experiencefragment--Header img, .cmp-experiencefragment--footer img, .cmp-experiencefragment--whirlpool-meganav img');
 
-    images.each((i, elem) => {
-      // Determine the image source. Prefer 'src' over 'data-src', and 'srcset' over 'data-srcset' when available
+    $('img').not('.cmp-experiencefragment--header img, .cmp-experiencefragment--Header img, .cmp-experiencefragment--footer img, .cmp-experiencefragment--whirlpool-meganav img').each((i, elem) => {
       let src = $(elem).attr('src') || $(elem).attr('data-src') || '';
-      let srcset = $(elem).attr('srcset') || $(elem).attr('data-srcset') || '';
+      let alt = $(elem).attr('alt') || '[No Alt Text]';
+      let isFlyoutImg = $(elem).parents('.flyout-img').length > 0;
 
-      // If the image is within a .flyout-img, attempt to use the srcset
-      if ($(elem).parents('.flyout-img').length && srcset) {
-        src = srcset.split(',')[0].trim().split(' ')[0];
+      if (isFlyoutImg) {
+        // For images within .flyout-img, we look for a source element with the data-srcset attribute.
+        const sourceElem = $(elem).closest('picture').find('source[data-srcset]').first();
+        let dataSrcset = sourceElem.attr('data-srcset');
+
+        if (dataSrcset) {
+          src = dataSrcset.split(',')[0].trim().split(' ')[0];
+        }
       }
 
-      // If src is a relative URL, prepend the base URL
       if (src && !src.startsWith('http://') && !src.startsWith('https://')) {
         src = new URL(src, baseUrl).href;
       }
 
-      // If src is still not a valid URL, use placeholder
       if (!src || !src.match(/^https?:\/\/.+\/.+/)) {
         src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/1362px-Placeholder_view_vector.svg.png";
       }
 
-      // Get alt text
-      const alt = $(elem).attr('alt') || '[No Alt Text]';
-      
-      // Push the src and alt into the altTexts array
       altTexts.push({ src, alt });
     });
 
