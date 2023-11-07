@@ -57,24 +57,26 @@ module.exports = async (req, res) => {
     });
 
     // Additional logic to handle .flyout-img picture source elements
-    $('.flyout-img picture source').each((i, elem) => {
-      let srcset = $(elem).attr('data-srcset') || $(elem).attr('srcset');
+    $('.flyout-img picture').each((i, elem) => {
+      // Find the source with the relevant srcset
+      const sourceElem = $(elem).find('source[data-srcset], source[srcset]').first();
+      let srcset = sourceElem.attr('data-srcset') || sourceElem.attr('srcset');
       console.log('Found srcset:', srcset);
-
+    
       if (srcset) {
         // Process srcset; assuming the first src in srcset is the image URL
-        srcset.split(',').forEach((srcItem) => {
-          console.log('Srcset item:', srcItem.trim().split(' ')[0]);
-        });
-        let src = srcset.split(' ')[0];
+        let src = srcset.split(',').map(item => item.trim().split(' ')[0])[0];
+        console.log('First srcset URL:', src);
+    
         if (src && !src.match(/^https?:\/\//)) {
           src = new URL(src, baseUrl).href;
         }
-        console.log('Final src:', src);
-
-        const alt = $(elem).siblings('img').attr('alt') || '[No Alt Text]';
+        console.log('Resolved src URL:', src);
+    
+        // Get alt text from the img element
+        const alt = $(elem).find('img').attr('alt') || '[No Alt Text]';
         console.log('Alt text:', alt);
-
+    
         if (src.match(/^https?:\/\/.+\/.+/)) {
           altTexts.push({ src, alt });
         }
