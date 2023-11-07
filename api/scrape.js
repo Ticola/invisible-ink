@@ -17,8 +17,7 @@ module.exports = async (req, res) => {
     });
     const html = response.data;
     const $ = cheerio.load(html);
-    const altTexts = [];
-    const processedSrcs = new Set(); // To keep track of processed src values
+    const altTexts = new Set();
 
     const getBaseUrl = (inputUrl) => {
       const urlObject = new URL(inputUrl);
@@ -27,31 +26,47 @@ module.exports = async (req, res) => {
 
     const baseUrl = getBaseUrl(url);
 
-    $('picture').not('.cmp-experiencefragment--header picture, .cmp-experiencefragment--Header picture, .cmp-experiencefragment--footer picture, .cmp-experiencefragment--whirlpool-meganav picture').each((i, pictureElem) => {
-      const imgElem = $(pictureElem).find('img');
-      let src = imgElem.attr('src') || imgElem.attr('data-src') || '';
-      let alt = imgElem.attr('alt') || '[No Alt Text]';
-      const sourceElem = $(pictureElem).find('source[data-srcset], source[srcset]').first();
-      const dataSrcset = sourceElem.attr('data-srcset') || sourceElem.attr('srcset');
+    // Process each picture element and its children source and img tags
+    $('picture').not('.cmp-experiencefragment--header picture, .cmp-experiencefragment--Header picture, .cmp-experiencefragment--footer picture, .cmp-experiencefragment--whirlpool-meganav picture').each((i, picture) => {
+      const sources = $(picture).find('source[data-srcset], source[srcset]');
+      const img = $(picture).find('img');
+      let src = '';
+      let alt = img.attr('alt') || '[No Alt Text]';
 
-      if (dataSrcset) {
-        src = dataSrcset.split(',')[0].trim().split(' ')[0];
+      if (sources.length) {
+        // Prefer data-srcset or srcset from the source elements within the picture
+        const sourceElem = sources.first();
+        src = sourceElem.attr('data-srcset') || sourceElem.attr('srcset');
+        src = src.split(',')[0].trim().split(' ')[0]; // Take the first src from srcset
+      } else {
+        // If no sources are found, fall back to the img src or data-src
+        src = img.attr('src') || img.attr('data-src') || '';
       }
+
+      if (src && !src.startsWith('http://') && !src.startsWith('https://')) {
+        src = new URL(src, baseUrl).href; // Resolve the src to a full URL if it's a relative path
+      }
+
+      if (src && src.match(/^https?:\/\/.+\/.+/)) {
+        altTexts.add({ src, alt }); // Use a Set to avoid duplicates
+      }
+    });
+
+    // Process img elements that are not inside a picture
+    $('img').not('picture img').not('.cmp-experiencefragment--header img, .cmp-experiencefragment--Header img, .cmp-experiencefragment--footer img, .cmp-experiencefragment--whirlpool-meganav img').each((i, img) => {
+      let src = $(img).attr('src') || $(img).attr('data-src') || '';
+      let alt = $(img).attr('alt') || '[No Alt Text]';
 
       if (src && !src.startsWith('http://') && !src.startsWith('https://')) {
         src = new URL(src, baseUrl).href;
       }
 
-      if (src && !processedSrcs.has(src)) { // Check if this src has not been processed before
-        if (!src.match(/^https?:\/\/.+\/.+/)) {
-          src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/1362px-Placeholder_view_vector.svg.png";
-        }
+      if (src && src.match(/^https?:\/\/.+\/.+/)) {
+        altTexts.add({ src, alt });
       }
-
-      altTexts.push({ src, alt });
     });
 
-    res.json({ altTexts });
+    res.json(Array.from(altTexts)); // Convert the Set to an Array for the response
   } catch (error) {
     console.error('An error occurred during scraping:', error);
     res.status(500).json({ error: 'An error occurred during scraping.' });
