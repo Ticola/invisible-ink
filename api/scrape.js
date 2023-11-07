@@ -27,14 +27,14 @@ module.exports = async (req, res) => {
 
     const baseUrl = getBaseUrl(url);
 
-    // Process all 'img' and 'picture img' elements in the order they appear in the HTML
+    // Process all 'picture' and 'img' elements in the order they appear in the HTML
     $('picture, img').not('header img, .footer img, .cmp-experiencefragment--header img, .cmp-experiencefragment--Header img, .cmp-experiencefragment--footer img, .cmp-experiencefragment--whirlpool-meganav img').each((i, elem) => {
       let src, alt;
 
       if (elem.tagName.toLowerCase() === 'picture') {
-        const imgElem = $(elem).find('img');
+        const sourceElem = $(elem).find('source').first();
+        const imgElem = $(elem).find('img').first();
         alt = imgElem.attr('alt') || '[No Alt Text]';
-        const sourceElem = $(elem).find('source[data-srcset], source[srcset]').first();
         const dataSrcset = sourceElem.attr('data-srcset') || sourceElem.attr('srcset');
 
         if (dataSrcset) {
@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
         } else {
           src = imgElem.attr('src') || imgElem.attr('data-src') || '';
         }
-      } else {
+      } else if (!$(elem).closest('picture').length) { // Check if the 'img' is not a child of 'picture'
         src = $(elem).attr('src') || $(elem).attr('data-src') || '';
         alt = $(elem).attr('alt') || '[No Alt Text]';
       }
