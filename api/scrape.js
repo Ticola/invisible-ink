@@ -26,19 +26,29 @@ module.exports = async (req, res) => {
 
     const baseUrl = getBaseUrl(url);
 
-    $('img').not('.cmp-experiencefragment--header img, .cmp-experiencefragment--Header img, .cmp-experiencefragment--footer img, .cmp-experiencefragment--whirlpool-meganav img').each((i, elem) => {
-      let src = $(elem).attr('src') || $(elem).attr('data-src') || '';
+    $('img, picture').not('.cmp-experiencefragment--header img, .cmp-experiencefragment--Header img, .cmp-experiencefragment--footer img, .cmp-experiencefragment--whirlpool-meganav img').each((i, elem) => {
+      let src = $(elem).attr('data-src') || $(elem).attr('src') || '';
       let alt = $(elem).attr('alt') || '[No Alt Text]';
-      let isFlyoutImg = $(elem).parents('.flyout-img').length > 0;
+      const picture = $(elem).is('picture') ? $(elem) : $(elem).closest('picture');
 
-      if (isFlyoutImg) {
-        // For images within .flyout-img, we look for a source element with the data-srcset attribute.
-        const sourceElem = $(elem).closest('picture').find('source[data-srcset]').first();
-        let dataSrcset = sourceElem.attr('data-srcset');
-
-        if (dataSrcset) {
-          src = dataSrcset.split(',')[0].trim().split(' ')[0];
+      // If the element is a picture with source elements
+      if (picture.length) {
+        // Prefer data-srcset or srcset from the source elements within the picture
+        const sourceElem = picture.find('source[data-srcset], source[srcset]').first();
+        src = sourceElem.attr('data-srcset') || sourceElem.attr('srcset');
+        
+        if (src) {
+          // Take the first src from srcset
+          src = src.split(',')[0].trim().split(' ')[0];
+        } else {
+          // If no srcset, use the img src or data-src
+          const imgElem = picture.find('img');
+          src = imgElem.attr('data-src') || imgElem.attr('src') || '';
+          alt = imgElem.attr('alt') || '[No Alt Text]';
         }
+      } else if ($(elem).is('img')) {
+        // For img elements, simply use src or data-src
+        src = $(elem).attr('data-src') || $(elem).attr('src') || '';
       }
 
       if (src && !src.startsWith('http://') && !src.startsWith('https://')) {

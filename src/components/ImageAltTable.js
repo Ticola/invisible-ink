@@ -34,7 +34,7 @@ const ImageAltTable = ({ altTexts, isLoading }) => {
                 <img
                   src={item.src}
                   alt={item.alt}
-                  className="mx-auto h-auto max-w-full max-h-fit"
+                  className="mx-auto h-auto max-w-full max-h-40"
                 />
               </div>
             </td>
