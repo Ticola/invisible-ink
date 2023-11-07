@@ -26,6 +26,7 @@ module.exports = async (req, res) => {
     };
 
     const baseUrl = getBaseUrl(url);
+    console.log('Base URL:', baseUrl);
 
     // Exclude images within the header and footer
     $('img').not('.header img').not('.footer img').not('.cmp-experiencefragment--header img').not('.cmp-experiencefragment--Header img').not('.cmp-experiencefragment--footer img').not('.cmp-experiencefragment--whirlpool-meganav img').each((i, elem) => {
@@ -44,6 +45,7 @@ module.exports = async (req, res) => {
           src = new URL(src, baseUrl).href;
         }
       }
+      console.log('Processing img src:', $(elem).attr('src'));
 
       // If src is still not a valid URL, use placeholder
       if (!src.match(/^https?:\/\/.+\/.+/)) {
@@ -57,13 +59,22 @@ module.exports = async (req, res) => {
     // Additional logic to handle .flyout-img picture source elements
     $('.flyout-img picture source').each((i, elem) => {
       let srcset = $(elem).attr('data-srcset') || $(elem).attr('srcset');
+      console.log('Found srcset:', srcset);
+
       if (srcset) {
         // Process srcset; assuming the first src in srcset is the image URL
+        srcset.split(',').forEach((srcItem) => {
+          console.log('Srcset item:', srcItem.trim().split(' ')[0]);
+        });
         let src = srcset.split(' ')[0];
         if (src && !src.match(/^https?:\/\//)) {
           src = new URL(src, baseUrl).href;
         }
+        console.log('Final src:', src);
+
         const alt = $(elem).siblings('img').attr('alt') || '[No Alt Text]';
+        console.log('Alt text:', alt);
+
         if (src.match(/^https?:\/\/.+\/.+/)) {
           altTexts.push({ src, alt });
         }
