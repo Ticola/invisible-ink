@@ -27,8 +27,8 @@ module.exports = async (req, res) => {
 
     const baseUrl = getBaseUrl(url);
 
-    // Exclude images within .cmp-experiencefragment--header and .cmp-experiencefragment--footer
-    $('img').not('.cmp-experiencefragment--header img').not('.cmp-experiencefragment--footer img').each((i, elem) => {
+    // Exclude images within the header and footer
+    $('img').not('.header img').not('.footer img').not('.cmp-experiencefragment--header img').not('.cmp-experiencefragment--Header img').not('.cmp-experiencefragment--footer img').not('.cmp-experiencefragment--whirlpool-meganav img').each((i, elem) => {
       let src = $(elem).attr('src') || '';
       // If src is not a full URL, check if it's a relative path or a placeholder
       if (!src.match(/^https?:\/\//)) {
@@ -52,6 +52,22 @@ module.exports = async (req, res) => {
 
       const alt = $(elem).attr('alt') || '[No Alt Text]';
       altTexts.push({ src, alt });
+    });
+
+    // Additional logic to handle .flyout-img picture source elements
+    $('.flyout-img picture source').each((i, elem) => {
+      let srcset = $(elem).attr('data-srcset') || $(elem).attr('srcset');
+      if (srcset) {
+        // Process srcset; assuming the first src in srcset is the image URL
+        let src = srcset.split(' ')[0];
+        if (src && !src.match(/^https?:\/\//)) {
+          src = new URL(src, baseUrl).href;
+        }
+        const alt = $(elem).siblings('img').attr('alt') || '[No Alt Text]';
+        if (src.match(/^https?:\/\/.+\/.+/)) {
+          altTexts.push({ src, alt });
+        }
+      }
     });
 
     res.json({ altTexts });
