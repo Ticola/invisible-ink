@@ -47,23 +47,11 @@ module.exports = async (req, res) => {
         src = new URL(src, baseUrl).href; // Resolve the src to a full URL if it's a relative path
       }
 
-      if (src && src.match(/^https?:\/\/.+\/.+/)) {
-        altTexts.add({ src, alt }); // Use a Set to avoid duplicates
-      }
-    });
-
-    // Process img elements that are not inside a picture
-    $('img').not('picture img').not('.cmp-experiencefragment--header img, .cmp-experiencefragment--Header img, .cmp-experiencefragment--footer img, .cmp-experiencefragment--whirlpool-meganav img').each((i, img) => {
-      let src = $(img).attr('src') || $(img).attr('data-src') || '';
-      let alt = $(img).attr('alt') || '[No Alt Text]';
-
-      if (src && !src.startsWith('http://') && !src.startsWith('https://')) {
-        src = new URL(src, baseUrl).href;
+      if (!src || !src.match(/^https?:\/\/.+\/.+/)) {
+        src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/1362px-Placeholder_view_vector.svg.png";
       }
 
-      if (src && src.match(/^https?:\/\/.+\/.+/)) {
-        altTexts.add({ src, alt });
-      }
+      altTexts.push({ src, alt });
     });
 
     res.json(Array.from(altTexts)); // Convert the Set to an Array for the response
