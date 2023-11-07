@@ -19,8 +19,8 @@ module.exports = async (req, res) => {
     const $ = cheerio.load(html);
     const altTexts = [];
     const processedSrcs = new Set(); // To keep track of processed src values
-    const excludedSelectors = '.cmp-experiencefragment--header picture, .cmp-experiencefragment--Header picture, .cmp-experiencefragment--footer picture, .cmp-experiencefragment--whirlpool-meganav picture';
-
+    const excludedSelectors = '.header img, .footer img, .cmp-experiencefragment--header img, .cmp-experiencefragment--Header img, .cmp-experiencefragment--footer img, .cmp-experiencefragment--whirlpool-meganav img';
+    
     const getBaseUrl = (inputUrl) => {
       const urlObject = new URL(inputUrl);
       return urlObject.protocol + '//' + urlObject.host;
@@ -28,6 +28,7 @@ module.exports = async (req, res) => {
 
     const baseUrl = getBaseUrl(url);
 
+    // Process 'picture' elements
     $('picture').not(excludedSelectors).each((i, pictureElem) => {
       const imgElem = $(pictureElem).find('img');
       let src = imgElem.attr('src') || imgElem.attr('data-src') || '';
@@ -43,13 +44,14 @@ module.exports = async (req, res) => {
         src = new URL(src, baseUrl).href;
       }
 
-      if (src && !processedSrcs.has(src)) { // Check if this src has not been processed before
-        processedSrcs.add(src); // Add src to processedSrcs to avoid duplicates later
+      if (src && !processedSrcs.has(src)) {
+        processedSrcs.add(src);
         altTexts.push({ src, alt });
       }
     });
 
-    $('img').not('picture img').each((i, imgElem) => { // Select img elements that are not inside picture elements
+    // Process 'img' elements not inside 'picture' tags and not within excluded selectors
+    $('img').not(`${excludedSelectors} img, picture img`).each((i, imgElem) => {
       let src = $(imgElem).attr('src') || $(imgElem).attr('data-src') || '';
       let alt = $(imgElem).attr('alt') || '[No Alt Text]';
 
@@ -58,11 +60,11 @@ module.exports = async (req, res) => {
       }
 
       if (src && !processedSrcs.has(src) && src.match(/^https?:\/\/.+\/.+/)) {
-        processedSrcs.add(src); // Add src to processedSrcs to track it
-        altTexts.push({ src, alt }); // Push the image information
+        processedSrcs.add(src);
+        altTexts.push({ src, alt });
       } else if (!src.match(/^https?:\/\/.+\/.+/)) {
         src = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Placeholder_view_vector.svg/1362px-Placeholder_view_vector.svg.png";
-        altTexts.push({ src, alt }); // Push the placeholder image information
+        altTexts.push({ src, alt });
       }
     });
 
