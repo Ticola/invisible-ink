@@ -13,6 +13,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [altTexts, setAltTexts] = useState([]);
   const [error, setError] = useState(null);
+  const clearError = () => {
+    setError(null);
+  };
 
   const handleUrlChange = (event) => {
     setUrl(event.target.value);
@@ -48,7 +51,7 @@ function App() {
             onSubmit={handleFormSubmit}
           />
           {loading && <Loader />}
-          <ErrorMessage message={error} />
+          <ErrorMessage message={error} clearError={clearError} />
           {!loading && !error && altTexts && <ImageAltTable altTexts={altTexts} />}
         </div>
       </main>
