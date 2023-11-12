@@ -6,10 +6,10 @@ const ErrorMessage = ({ message }) => {
   useEffect(() => {
     if (message) {
       setIsVisible(true);
-      // Optionally set a timeout to hide the message after some time
+      console.log("ErrorMessage received:", message); // Add this line
       const timer = setTimeout(() => {
         setIsVisible(false);
-      }, 5000); // 3 seconds for example
+      }, 9000);
 
       return () => clearTimeout(timer);
     }

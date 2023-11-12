@@ -7,13 +7,15 @@ const scrapeAltTexts = async (url) => {
   } catch (error) {
     console.error('Error scraping data:', error);
 
-    // Check if the error response has a specific message
-    if (error.response && error.response.data && error.response.data.error) {
-      throw new Error(error.response.data.error);
-    } else {
-      // Generic error message for other types of errors
-      throw new Error("Failed to scrape the website. Please try again.");
+    // A user-friendly error message
+    let errorMessage = "We're unable to scrape data from this URL. This can happen if the site blocks scraping or requires special access.";
+
+    // You can still log the technical details for debugging purposes
+    if (error.response) {
+      console.error('Detailed error:', error.response.data.error || error.response.statusText);
     }
+
+    throw new Error(errorMessage);
   }
 };
 

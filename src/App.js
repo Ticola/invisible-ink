@@ -29,13 +29,13 @@ function App() {
     } catch (error) {
       console.error('Error fetching alt texts:', error);
       setError(error.message); // Set the error message
+      console.log("Error occurred:", error.message); // Add this line to check the error
       setAltTexts([]);
     }
   
     setLoading(false);
   };
-  
-  
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
