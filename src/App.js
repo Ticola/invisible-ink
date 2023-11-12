@@ -5,12 +5,14 @@ import InputForm from './components/InputForm';
 import Loader from './components/Loader';
 import Footer from './components/Footer';
 import ImageAltTable from './components/ImageAltTable';
+import ErrorMessage from './components/ErrorMessage';
 import { scrapeAltTexts } from './services/scrapeService';
 
 function App() {
   const [url, setUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [altTexts, setAltTexts] = useState([]);
+  const [error, setError] = useState(null);
 
   const handleUrlChange = (event) => {
     setUrl(event.target.value);
@@ -19,17 +21,20 @@ function App() {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
+    setError(null); // Reset error state on new form submission
   
     try {
       const fetchedAltTexts = await scrapeAltTexts(url);
       setAltTexts(fetchedAltTexts);
     } catch (error) {
       console.error('Error fetching alt texts:', error);
+      setError(error.message); // Set the error message
       setAltTexts([]);
     }
   
     setLoading(false);
   };
+  
   
   return (
     <div className="flex flex-col min-h-screen">
@@ -43,12 +48,13 @@ function App() {
             onSubmit={handleFormSubmit}
           />
           {loading && <Loader />}
-          {!loading && altTexts && <ImageAltTable altTexts={altTexts} />}
+          <ErrorMessage message={error} />
+          {!loading && !error && altTexts && <ImageAltTable altTexts={altTexts} />}
         </div>
       </main>
       <Footer />
     </div>
-  );
+  );  
 }
 
 export default App;

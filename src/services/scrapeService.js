@@ -6,7 +6,14 @@ const scrapeAltTexts = async (url) => {
     return response.data.altTexts;
   } catch (error) {
     console.error('Error scraping data:', error);
-    throw error;
+
+    // Check if the error response has a specific message
+    if (error.response && error.response.data && error.response.data.error) {
+      throw new Error(error.response.data.error);
+    } else {
+      // Generic error message for other types of errors
+      throw new Error("Failed to scrape the website. Please try again.");
+    }
   }
 };
 

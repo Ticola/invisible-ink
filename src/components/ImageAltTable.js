@@ -4,7 +4,6 @@ const ImageAltTable = ({ altTexts, isLoading }) => {
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
-
   useEffect(() => {
     if (!isLoading && altTexts && altTexts.length > 0) {
       setIsDataLoaded(true);
