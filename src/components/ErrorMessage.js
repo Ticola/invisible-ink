@@ -1,17 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 const ErrorMessage = ({ message, clearError }) => {
-  const [isVisible, setIsVisible] = useState(false);
-
   useEffect(() => {
-    if (message) {
-      setIsVisible(true);
-    }
-
+    // Close the modal when the Esc key is pressed
     const handleKeyDown = (event) => {
-      if (event.keyCode === 27) { // 27 is the keycode for the Esc key
-        clearError();
-      }
+      if (event.keyCode === 27) clearError(); // 27 is the keycode for the Esc key
     };
 
     // Add event listener for the Esc key
@@ -21,7 +14,7 @@ const ErrorMessage = ({ message, clearError }) => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [message, clearError]);
+  }, [clearError]);
 
   // Function to close the modal
   const handleClose = () => {
@@ -33,7 +26,7 @@ const ErrorMessage = ({ message, clearError }) => {
     e.stopPropagation();
   };
 
-  if (!isVisible) {
+  if (!message) {
     return null;
   }
 
