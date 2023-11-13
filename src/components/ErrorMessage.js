@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import CloseIcon from './CloseIcon';
 
 const ErrorMessage = ({ message, clearError }) => {
   useEffect(() => {
@@ -33,7 +34,9 @@ const ErrorMessage = ({ message, clearError }) => {
   return (
     <div className="modal-backdrop" onClick={handleClose}>
       <div className="modal-content" onClick={handleModalClick}>
-        <button className="modal-close" onClick={handleClose}>X</button>
+        <button className="modal-close" onClick={handleClose}>
+          <CloseIcon />
+        </button>
         {message}
       </div>
     </div>
